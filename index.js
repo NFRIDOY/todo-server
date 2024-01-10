@@ -59,17 +59,20 @@ async function run() {
             }
 
         })
-        app.post("/api/v1/todo", async (req, res) => {
+        app.get("/api/v1/todo", async (req, res) => {
             try {
                 // console.log(req.body);
-                const newTask = req.body;
+                // const newTask = req.body;
 
-                console.log("\nnew Task\n");
-                console.log(newTask);
+                // console.log("\nnew Task\n");
+                // console.log(newTask);
                 // TODO: SET filter
-                const result = await TaskCollection.find().toArray;
 
-                console.log(`A Task was inserted with the _id: ${result.insertedId}`);
+                const query = {};
+                const options = {};
+                const result = await TaskCollection.find(query, options).toArray();
+
+                // console.log(`A Task was inserted with the _id: ${result.insertedId}`);
 
                 res.send(result);
             } catch (error) {
