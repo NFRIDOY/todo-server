@@ -1,16 +1,23 @@
 const express = require('express')
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors')
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000;
 
-app.use(cors())
+// req 
+app.use(express.json());
+// app.use(cors())
+app.use(cors({
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true
+}));
 
 // // ################################# ################################# MogoDB operations Start
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = process.env.URI;
+// console.log(process.env.URI);
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -37,15 +44,36 @@ async function run() {
         // APIs
         app.post("/api/v1/task", async (req, res) => {
             try {
+                // console.log(req.body);
                 const newTask = req.body;
 
-                const result = await haiku.insertOne(newTask);
+                console.log("\nnew Task\n");
+                console.log(newTask);
+                const result = await TaskCollection.insertOne(newTask);
 
                 console.log(`A Task was inserted with the _id: ${result.insertedId}`);
 
                 res.send(result);
             } catch (error) {
-                console.log(error);
+                // console.log(error);
+            }
+
+        })
+        app.post("/api/v1/todo", async (req, res) => {
+            try {
+                // console.log(req.body);
+                const newTask = req.body;
+
+                console.log("\nnew Task\n");
+                console.log(newTask);
+                // TODO: SET filter
+                const result = await TaskCollection.find().toArray;
+
+                console.log(`A Task was inserted with the _id: ${result.insertedId}`);
+
+                res.send(result);
+            } catch (error) {
+                // console.log(error);
             }
 
         })
