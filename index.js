@@ -1,5 +1,5 @@
 const express = require('express')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors')
 require('dotenv').config()
 const app = express()
@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 // app.use(cors())
 app.use(cors({
-    origin: ["https://todo-amber-five-99.vercel.app","http://localhost:5173", "http://localhost:5174"],
+    origin: ["https://todo-amber-five-99.vercel.app", "http://localhost:5173", "http://localhost:5174"],
     credentials: true
 }));
 
@@ -59,7 +59,7 @@ async function run() {
             }
 
         })
-        app.get("/api/v1/todo", async (req, res) => {
+        app.get("/api/v1/tasks", async (req, res) => {
             try {
                 // console.log(req.body);
                 // const newTask = req.body;
@@ -68,17 +68,158 @@ async function run() {
                 // console.log(newTask);
                 // TODO: SET filter
 
-                const query = {};
+                const statusQuery = req.query.status;
+
+                const query = { status: statusQuery };
                 const options = {};
                 const result = await TaskCollection.find(query, options).toArray();
-
-                // console.log(`A Task was inserted with the _id: ${result.insertedId}`);
-
                 res.send(result);
+
             } catch (error) {
                 // console.log(error);
             }
 
+        })
+
+        app.put("/api/v1/previousTask", async (req, res) => {
+            try {
+                const task = req.body;
+                // console.log(req.params.id);
+                // console.log(id);
+                const filter = { _id: new ObjectId(task?._id) };
+                /* Set the upsert option to insert a document if no documents match
+                the filter */
+                const options = { upsert: true };
+                // Specify the update to set a value for the plot field
+
+                let updateDoc = {};
+                if (task?.staus == "todo") {
+                    updateDoc = {
+                        $set: {
+                            status: `Incomplete`
+                        },
+                    };
+                }
+                else if (task?.staus == "Doing") {
+                    updateDoc = {
+                        $set: {
+                            status: `todo`
+                        },
+                    };
+                }
+                else if (task?.staus == "Under Review") {
+                    updateDoc = {
+                        $set: {
+                            status: `Doing`
+                        },
+                    };
+                }
+                else if (task?.staus == "Completed") {
+                    updateDoc = {
+                        $set: {
+                            status: `Under Review`
+                        },
+                    };
+                }
+                else if (task?.staus == "OverDated") {
+                    updateDoc = {
+                        $set: {
+                            status: `Incomplete`
+                        },
+                    };
+                }
+                // else {
+                //     updateDoc = {
+                //         $set: {
+                //             status: `Incomplete`
+                //         },
+                //     };
+                // }
+                // Update the first document that matches the filter
+                const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                res.send(result);
+            } catch (error) {
+                console.log(error)
+                res.send(error)
+            }
+        })
+        app.put("/api/v1/nextTask", async (req, res) => {
+            try {
+                const task = req.body;
+                const filter = { _id: new ObjectId(task?._id) };
+                /* Set the upsert option to insert a document if no documents match
+                the filter */
+                const options = { upsert: true };
+                // Specify the update to set a value for the plot field
+                let updateDoc = {};
+                if (task?.staus == "Incomplete") {
+                    updateDoc = {
+                        $set: {
+                            status: `todo`
+                        },
+                    };
+                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                    res.send(result);
+                }
+                else if (task?.staus == "todo ") {
+                    updateDoc = {
+                        $set: {
+                            status: `Doing`
+                        },
+                    };
+                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                    res.send(result);
+                }
+                else if (task?.staus == "Doing") {
+                    updateDoc = {
+                        $set: {
+                            status: `Under Review`
+                        },
+                    };
+                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                    res.send(result);
+                }
+                else if (task?.staus == "Under Review") {
+                    updateDoc = {
+                        $set: {
+                            status: `Completed`
+                        },
+                    };
+                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                    res.send(result);
+                }
+                else if (task?.staus == "Completed") {
+                    updateDoc = {
+                        $set: {
+                            status: `OverDated`
+                        },
+                    };
+                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                    res.send(result);
+                }
+                else if (task?.staus == "OverDated") {
+                    updateDoc = {
+                        $set: {
+                            status: `Incomplete`
+                        },
+                    };
+                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                    res.send(result);
+                }
+                // else {
+                //     updateDoc = {
+                //         $set: {
+                //             status: `Incomplete`
+                //         },
+                //     };
+                // }
+                // Update the first document that matches the filter
+                const result = await TaskCollection.updateOne(filter, updateDoc, options);
+                res.send(result);
+            } catch (error) {
+                console.log(error)
+                res.send(error)
+            }
         })
 
 
