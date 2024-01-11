@@ -87,54 +87,63 @@ async function run() {
                 // console.log(req.params.id);
                 // console.log(id);
                 const filter = { _id: new ObjectId(task?._id) };
+                // console.log(filter);
                 /* Set the upsert option to insert a document if no documents match
                 the filter */
                 const options = { upsert: true };
                 // Specify the update to set a value for the plot field
-
+                // console.log(task?.status);
                 let updateDoc = {};
-                if (task?.staus == "todo") {
+                if (task?.status == "todo") {
                     updateDoc = {
                         $set: {
                             status: `Incomplete`
                         },
                     };
                 }
-                else if (task?.staus == "Doing") {
+                else if (task?.status == "Doing") {
                     updateDoc = {
                         $set: {
                             status: `todo`
                         },
                     };
                 }
-                else if (task?.staus == "Under Review") {
+                else if (task?.status == "Under Review") {
                     updateDoc = {
                         $set: {
                             status: `Doing`
                         },
                     };
                 }
-                else if (task?.staus == "Completed") {
+                else if (task?.status == "Completed") {
                     updateDoc = {
                         $set: {
                             status: `Under Review`
                         },
                     };
                 }
-                else if (task?.staus == "OverDated") {
+                else if (task?.status == "OverDated") {
                     updateDoc = {
                         $set: {
                             status: `Incomplete`
                         },
                     };
                 }
-                // else {
-                //     updateDoc = {
-                //         $set: {
-                //             status: `Incomplete`
-                //         },
-                //     };
-                // }
+                else if (task?.status == "Incomplete") {
+                    updateDoc = {
+                        $set: {
+                            status: `OverDated`
+                        },
+                    };
+                }
+                else {
+                    updateDoc = {
+                        $set: {
+                            status: `Incomplete`
+                        },
+                    };
+                }
+                // console.log(updateDoc);
                 // Update the first document that matches the filter
                 const result = await TaskCollection.updateOne(filter, updateDoc, options);
                 res.send(result);
@@ -152,64 +161,58 @@ async function run() {
                 const options = { upsert: true };
                 // Specify the update to set a value for the plot field
                 let updateDoc = {};
-                if (task?.staus == "Incomplete") {
+                if (task?.status == "Incomplete") {
                     updateDoc = {
                         $set: {
                             status: `todo`
                         },
                     };
-                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
-                    res.send(result);
+                    
                 }
-                else if (task?.staus == "todo ") {
+                else if (task?.status == "todo") {
                     updateDoc = {
                         $set: {
                             status: `Doing`
                         },
                     };
-                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
-                    res.send(result);
+                    
                 }
-                else if (task?.staus == "Doing") {
+                else if (task?.status == "Doing") {
                     updateDoc = {
                         $set: {
                             status: `Under Review`
                         },
                     };
-                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
-                    res.send(result);
+                    
                 }
-                else if (task?.staus == "Under Review") {
+                else if (task?.status == "Under Review") {
                     updateDoc = {
                         $set: {
                             status: `Completed`
                         },
                     };
-                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
-                    res.send(result);
+                    
                 }
-                else if (task?.staus == "Completed") {
+                else if (task?.status == "Completed") {
                     updateDoc = {
                         $set: {
                             status: `OverDated`
                         },
                     };
-                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
-                    res.send(result);
+                    
                 }
-                else if (task?.staus == "OverDated") {
+                else if (task?.status == "OverDated") {
                     updateDoc = {
                         $set: {
                             status: `Incomplete`
                         },
                     };
-                    const result = await TaskCollection.updateOne(filter, updateDoc, options);
-                    res.send(result);
+                    
                 }
                 // else {
                 //     updateDoc = {
                 //         $set: {
-                //             status: `Incomplete`
+                //             status: `todo`
                 //         },
                 //     };
                 // }
